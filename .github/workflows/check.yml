@@ -16,6 +16,13 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Forks legitimately differ from the documented canonical URL, which would
+      # make check 16 red for every fork. A fork can set this repository
+      # variable to the upstream slug; when it is unset the value is empty and
+      # check.sh falls back to the git remote, which is what the canonical
+      # repository wants.
+      EXAM_PROTOCOL_REPO_SLUG: ${{ vars.EXAM_PROTOCOL_REPO_SLUG }}
     steps:
       - uses: actions/checkout@v4
 
@@ -25,6 +32,36 @@ jobs:
           awk --version | head -n 1
           grep --version | head -n 1
           command -v sha256sum
+          # Checks 10-12 parse the packaging manifests and need node. It ships
+          # on this runner image; if that ever stops being true they would
+          # report skip, and the next step turns that into a failure.
+          node --version
 
       - name: Run repository gates
-        run: sh scripts/check.sh
+        run: sh scripts/check.sh | tee /tmp/gates.txt
+
+      - name: Fail if any gate skipped rather than ran
+        # A skip is honest inside check.sh — it never reports a missing tool as
+        # a pass. But in CI a skip is a gate that silently stopped guarding, and
+        # the whole point of this workflow is that it cannot do that quietly.
+        run: |
+          if ! grep -q ', 0 skipped' /tmp/gates.txt; then
+            echo "::error::A gate skipped instead of running. A skipped gate guards nothing."
+            grep '^skip' /tmp/gates.txt || true
+            exit 1
+          fi
+
+# Not run here: `claude plugin validate`.
+#
+# It is the authority on the manifest schema and it is the command CONTRIBUTING.md
+# tells a contributor to run locally. It is deliberately absent from CI because
+# adding it would mean installing the Claude Code CLI on the runner, and this
+# project has not verified that `plugin validate` succeeds there without an
+# authenticated session. A step that cannot be shown to run is worse than no
+# step: it reports green for a check that never happened, which is the first
+# failure mode in references/failure-modes.md.
+#
+# What CI does cover: checks 10-12 parse both manifests, resolve the marketplace
+# entry to a real plugin directory, and reject reserved marketplace names —
+# measured on this repository, the last two are things `claude plugin validate`
+# does not do. See CONTRIBUTING.md, "The packaging gates".

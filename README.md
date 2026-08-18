@@ -2,8 +2,9 @@
 
 **Before you say "done", have someone else write you an exam you cannot answer.**
 
-A portable protocol for adversarial verification, packaged as a skill that works
-in both [Claude Code](#claude-code) and [Codex and other `AGENTS.md` agents](#codex-and-other-agentsmd-agents).
+A portable protocol for adversarial verification, packaged as a Claude Code
+plugin, a standalone Claude Code skill, and a plain file that `AGENTS.md` agents
+can read. [Jump to install](#install).
 
 ---
 
@@ -35,6 +36,44 @@ vocabulary (§7) means **treat as unverified**: it is an observation made then,
 in a private repository you cannot open. See `does_not_grade` below.
 
 Nothing about the authors was careless. Self-review simply cannot see this.
+
+## Where this sits
+
+This is a **verification** tool, and it runs late. The complementary move —
+sharpening a plan *before* anyone builds it — is a different job, and the
+`grilling` / `grill-me` skill in
+[`mattpocock-skills`](https://github.com/anthropics/claude-plugins-official)
+does it well. Requirements first, verification after; they are not substitutes,
+and pairing them is the intended use.
+
+The comparison below was read from that skill's own source on one machine
+(**`mattpocock-skills` v1.2.3, read 2026-08-19**). Skills change; by this
+project's own rule (§7) a description of a file is an observation of the moment
+it was read, so the version is part of the claim.
+
+| | `grilling` / `grill-me` | `exam-protocol` |
+|---|---|---|
+| When it runs | **Before** you act — "Do not act on it until the user confirms you have reached a shared understanding." | **After** the work exists and someone is about to call it done |
+| What it examines | **A human's decisions** — a plan, a design, an idea | **A produced artifact** — a brief, a ledger, a "done" claim |
+| Shape | An interactive interview, in rounds over a design tree | A sealed exam, delivered once |
+| **The asker and the answer** | The asker **supplies their own recommended answer** to every question (`➡️ <your recommended answer>`) | The author is **forbidden from answering their own questions**, and records locations rather than conclusions |
+| Who answers | The user | A second agent in fresh context, who never sees the author's reasoning |
+| Arbitration | None — the user decides | A separate arbiter, who may not answer |
+| Mutation testing / negative controls / evidence labels | None | Yes |
+| Is it a CI gate? | **No** | **No, either** |
+| The core question | *"What am I missing?"* | *"Can you prove it?"* |
+
+The fourth row is the real inversion, and it is a design choice on both sides
+rather than a defect on either. An interview is more useful when the interviewer
+commits to an answer you can push back on. An exam is only useful when the
+author has not already written the answer down, because the second fresh reader
+*is* the mechanism.
+
+Two things worth stating plainly. `grill-me` carries
+`disable-model-invocation: true`, so it is invoked by slash command and does not
+fire from a description — do not expect it to trigger on its own. And **neither
+tool is a gate**: that row is a similarity, not a difference, and admitting it
+is what makes the rest of the table worth reading.
 
 ## What a confident pass looks like — and what actually caught each one
 
@@ -127,16 +166,60 @@ report, and a full round trip.
 
 ## Install
 
-The canonical repository is `https://github.com/blackmoore14/exam-protocol`.
+The canonical repository is
+`https://github.com/blackmoore14/exam-protocol-skill`. Pick **one** path below —
+installing by two paths at once gives you two copies of a protocol document that
+nothing compares, which is the exact failure this project exists to catch. See
+[If you use both](#if-you-use-both--keep-one-copy-not-two).
 
-### Claude Code
+### Claude Code — as a plugin
 
-Copy the skill into your skills directory — personal:
+This repository is its own marketplace, so both steps point at the same place:
+
+```
+/plugin marketplace add blackmoore14/exam-protocol-skill
+/plugin install exam-protocol@exam-protocol-marketplace
+```
+
+The equivalent outside a session:
 
 ```bash
-git clone https://github.com/blackmoore14/exam-protocol.git
+claude plugin marketplace add blackmoore14/exam-protocol-skill
+claude plugin install exam-protocol@exam-protocol-marketplace
+```
+
+Read back what actually landed, rather than trusting the success message:
+
+```bash
+claude plugin details exam-protocol@exam-protocol-marketplace
+#   Component inventory
+#     Skills (1)  exam-protocol
+```
+
+`Skills (1)` is the line that matters. The plugin manifest deliberately declares
+**no** `skills` field: skills are auto-discovered from the top-level `skills/`
+directory, so the plugin and the standalone skill are the *same bytes on disk*
+rather than two copies that can drift. If that line says `Skills (0)`, the
+plugin loaded but the protocol did not.
+
+To try it from a local clone before trusting the network, add the working tree
+directly — the leading `./` is required:
+
+```bash
+git clone https://github.com/blackmoore14/exam-protocol-skill.git
+cd exam-protocol-skill
+claude plugin marketplace add ./
+claude plugin install exam-protocol@exam-protocol-marketplace
+```
+
+### Claude Code — as a standalone skill
+
+If you would rather not add a marketplace, copy the skill directory. Personal:
+
+```bash
+git clone https://github.com/blackmoore14/exam-protocol-skill.git
 rm -rf ~/.claude/skills/exam-protocol
-cp -r exam-protocol/skills/exam-protocol ~/.claude/skills/exam-protocol
+cp -r exam-protocol-skill/skills/exam-protocol ~/.claude/skills/exam-protocol
 ```
 
 …or scoped to one project:
@@ -144,7 +227,7 @@ cp -r exam-protocol/skills/exam-protocol ~/.claude/skills/exam-protocol
 ```bash
 mkdir -p .claude/skills
 rm -rf .claude/skills/exam-protocol
-cp -r /path/to/exam-protocol/skills/exam-protocol .claude/skills/exam-protocol
+cp -r /path/to/exam-protocol-skill/skills/exam-protocol .claude/skills/exam-protocol
 ```
 
 **The `rm -rf` is the upgrade, and it is not optional.** `cp -r src dst` where
@@ -162,14 +245,8 @@ grep -A2 '^metadata:' ~/.claude/skills/exam-protocol/SKILL.md
 #   version: "0.1.0"
 ```
 
-Then invoke it by name (`/exam-protocol`), or describe the situation — the
-skill's `description` field triggers on phrases like *"am I really done"*,
-*"review my test plan"*, *"sealed exam"*, *"negative control"*, and *"before I
-ship"*.
-
-> **Scope of that last claim:** description-based triggering is a Claude Code
-> feature. `AGENTS.md` agents have no skill loader and no frontmatter parser —
-> see the next section.
+The plugin path has no equivalent hazard: `claude plugin update` replaces rather
+than merges. That is the reason to prefer it.
 
 ### Codex and other `AGENTS.md` agents
 
@@ -193,9 +270,12 @@ and before marking anything "verified" in a status document, follow
 ```
 <!-- /shared-snippet -->
 
-There is no skill system on this path and no frontmatter parsing. The agent
-reads `SKILL.md` because your `AGENTS.md` told it to; nothing triggers on a
-phrase, and the YAML block at the top of the file is inert text.
+**There is no skill system on this path.** No plugin, no marketplace, no
+frontmatter parsing, no `/exam-protocol`, and nothing that fires on a phrase.
+The agent reads `SKILL.md` for exactly one reason: your `AGENTS.md` told it to.
+The YAML block at the top of the file is inert text there. Everything the
+protocol asks for still works — it is prose and templates, not machinery — but
+the loading is manual and it is on you to keep the pointer accurate.
 
 This repository's own [`AGENTS.md`](AGENTS.md) is that entry point. It is a
 pointer plus harness-specific loading guidance, and it defines no rules.
@@ -239,7 +319,140 @@ by trial. Change both together:
 | your project's `AGENTS.md` | the path inside the `## Verification` block |
 
 If your organization namespaces skills, use `<org>-exam-protocol` in both.
-Nothing else inside the skill directory refers to its own name.
+Nothing else inside the skill directory refers to its own name. In this
+repository `scripts/check.sh` check 13 fails when those copies disagree.
+
+## I installed it — now what?
+
+The protocol needs **three separate sessions**, because the separations are the
+entire mechanism. Run them in this order.
+
+**1. Author the exam** — a fresh session that has not seen how the work was
+built. On the plugin or skill path, invoke by name:
+
+```
+/exam-protocol docs/release-plan.md
+```
+
+…or describe the situation and let the description trigger it:
+
+> *"I'm about to tell the client this migration is done. Am I really done?"*
+>
+> *"Review this test plan before I hand it to QA — I want the questions I'm not
+> asking myself."*
+>
+> *"Write me a sealed exam over `CHANGELOG.md` and the release checklist. You
+> are read-only; do not answer your own questions."*
+
+Trigger phrases the skill's `description` carries include *"am I really done"*,
+*"sealed exam"*, *"before I ship"*, *"negative control"*, *"covariate"*,
+*"mutation test"*, and *"does_not_grade"*. On the `AGENTS.md` path none of this
+applies — say "follow `.agents/exam-protocol/SKILL.md`" instead.
+
+**2. Seal it, then answer it in a different session.** The answerer gets the
+sealed exam file and nothing else — not your reasoning, not the author's:
+
+> *"Answer the sealed exam at `exams/release-r1-exam.md`. Verify both hashes
+> first. Use only FAIL, PASS, or UNRESOLVED, and cite where you checked."*
+
+**3. Arbitrate, in your own session.** Fix, withdraw with a stated reason, or
+accept as `UNRESOLVED`. You do not answer.
+
+Two shortcuts worth knowing on day one. If the exam comes back **all green**,
+that is a claim about the exam and not about your work — damage a copy of the
+artifact deliberately and re-answer; if it stays green the questions are loose
+(`SKILL.md` §3.3). And if you are writing something *another person or agent*
+will execute, paste
+[`templates/rehearsal-handoff.md`](skills/exam-protocol/templates/rehearsal-handoff.md)
+as its first section: it costs the executor five minutes and it is the single
+highest-yield piece of the protocol.
+
+## Compatibility
+
+What each host actually provides. The asymmetry is real and worth reading before
+you pick a path.
+
+| | Claude Code — plugin | Claude Code — skill | Codex / other `AGENTS.md` agents |
+|---|---|---|---|
+| Install mechanism | `/plugin install` from a marketplace | copy a directory | copy a directory |
+| Reads `SKILL.md` frontmatter | yes | yes | **no** — inert text |
+| `/exam-protocol` invocation | yes | yes | **no** |
+| Triggers on a described situation | yes | yes | **no** |
+| How it gets loaded | the plugin loader | the skill loader | **your `AGENTS.md` tells the agent to read the file** |
+| Managed updates | `claude plugin update` | manual `rm -rf` + `cp -r` | manual `rm -rf` + `cp -r` |
+| The protocol itself works | yes | yes | **yes** |
+| Templates and references usable | yes | yes | yes |
+
+The last two rows are the point. `AGENTS.md` agents lose the *ergonomics* — the
+name, the trigger, the update path — and lose none of the *protocol*, because
+the protocol is prose and forms rather than machinery. What you give up is
+convenience and a guarantee that it was loaded at all.
+
+## Updating
+
+| Path | Command |
+|---|---|
+| Plugin | `/plugin marketplace update` then `/plugin install` again, or `claude plugin update exam-protocol@exam-protocol-marketplace` |
+| Standalone skill | `git pull`, then `rm -rf ~/.claude/skills/exam-protocol` and `cp -r` again — **the `rm -rf` is mandatory**, see above |
+| `AGENTS.md` | `git pull`, then `rm -rf .agents/exam-protocol` and `cp -r` again |
+
+After a plugin update, `/reload-plugins` applies it without restarting the
+session. After a manual copy, re-read the version out of the installed file
+rather than the repository — that is the copy the loader will use:
+
+```bash
+grep -A2 '^metadata:' ~/.claude/skills/exam-protocol/SKILL.md
+```
+
+If you vendored the skill into a project, `diff -r` your copy against upstream
+before overwriting. Local edits to a vendored `SKILL.md` are the thing
+[`SKILL.md` §10](skills/exam-protocol/SKILL.md) exists to prevent — put local
+rules in `SKILL.local.md` beside it and the diff keeps working.
+
+## Uninstalling
+
+| Path | Command |
+|---|---|
+| Plugin | `claude plugin uninstall exam-protocol@exam-protocol-marketplace` and, if you want the source gone too, `claude plugin marketplace remove exam-protocol-marketplace` |
+| Standalone skill | `rm -rf ~/.claude/skills/exam-protocol` or `rm -rf .claude/skills/exam-protocol` |
+| `AGENTS.md` | `rm -rf .agents/exam-protocol` **and delete the `## Verification` block from your `AGENTS.md`** |
+
+The `AGENTS.md` row has a second step for a reason: a pointer left behind after
+the file is gone tells an agent to read something that does not exist, and how
+each harness reacts to that is not something this project can promise.
+
+Nothing here writes outside those directories. Exams you have already produced
+live in your own repository and are yours to keep — they are the audit trail.
+
+## Distribution
+
+This repository is **its own marketplace**. `.claude-plugin/marketplace.json`
+names one plugin, whose `source` is `"./"` — the repository root, which is also
+the plugin root. Adding the repository as a marketplace and installing the
+plugin from it are two steps over the same bytes.
+
+**It is not listed in any Anthropic marketplace, and nothing here has been
+submitted to one.** If you found this expecting an official listing, there
+isn't one. Getting listed would mean meeting whatever the receiving marketplace
+requires and being accepted by its owners; the official docs available to this
+project do not state that process, so it is not described here rather than
+guessed at. Until then, `/plugin marketplace add blackmoore14/exam-protocol-skill`
+is the distribution channel, and it is a first-party one: you are adding *this*
+repository, not trusting an intermediary.
+
+Both manifests are checked in CI-adjacent form by `scripts/check.sh` (checks
+10–12) and can be validated directly:
+
+```bash
+claude plugin validate .claude-plugin/plugin.json
+claude plugin validate .claude-plugin/marketplace.json
+```
+
+That command validates **schema**. Measured on this repository, it does not
+resolve a plugin `source` — a marketplace pointing at a directory that does not
+exist still passes — and it does not reject a reserved marketplace name. Check
+12 resolves the source and check 11 rejects reserved names, which is why both
+exist alongside it rather than deferring to it.
 
 ## What it does not do — `does_not_grade`
 
@@ -281,6 +494,10 @@ This section is the reason to trust the rest of the page.
   structure, not doctrine. By this project's own N-doors argument that means the
   individual rules are untested, and we have not done the one experiment that
   would fix it.
+- **Packaging is verified; publication is not.** The manifests validate, and the
+  plugin has been installed from a local clone and confirmed to expose the skill.
+  Installing from the GitHub URL, on a machine that is not this one, has not been
+  measured — the first person to run it is the test.
 
 ## Repository layout
 
@@ -292,16 +509,20 @@ CHANGELOG.md                   Keep a Changelog
 CONTRIBUTING.md                including the one-source-of-truth rule
 CODE_OF_CONDUCT.md             Contributor Covenant 2.1
 .gitattributes                 pins .md to LF, because the seal hashes bytes
+.claude-plugin/
+  plugin.json                  plugin manifest — no skills field on purpose
+  marketplace.json             this repository as a single-plugin marketplace
 scripts/check.sh               the repository's own gates — run it before a PR
 .github/workflows/check.yml    runs that script on push and pull request
-skills/exam-protocol/
+skills/exam-protocol/          auto-discovered by the plugin loader; also the
+                               directory you copy for the other two install paths
   SKILL.md                     the protocol (normative, single source of truth)
   references/
     discrimination.md          covariates, negative controls, mutation testing,
                                the N-doors rule, bypass inventory
     failure-modes.md           anonymized post-mortems behind every rule
   templates/
-    exam.md  answers.md  seal.md
+    exam.md  answers.md  seal.md  rehearsal-handoff.md
 examples/                      FICTIONAL artifact, staged findings
   checkout-brief-r1-exam.md    a complete worked exam — 14 questions
   checkout-brief-r1-answers.md its answer sheet — 11 red, 1 green,
@@ -312,6 +533,9 @@ exams/                         this protocol run against ITSELF, reds still open
   exam-protocol-self-r1-answers.md
   SEAL.md
 ```
+
+There is exactly one `SKILL.md` in this tree and `scripts/check.sh` check 14
+keeps it that way. All three install paths distribute that same file.
 
 ## Provenance
 

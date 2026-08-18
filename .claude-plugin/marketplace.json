@@ -1,0 +1,24 @@
+{
+  "name": "exam-protocol-marketplace",
+  "description": "Single-plugin marketplace published by this repository. Not an Anthropic marketplace, and not listed in one.",
+  "owner": {
+    "name": "blackmoore14",
+    "url": "https://github.com/blackmoore14"
+  },
+  "plugins": [
+    {
+      "name": "exam-protocol",
+      "source": "./",
+      "description": "Adversarial verification: a sealed exam authored by someone who did not do the work, answered by someone who did not write the exam.",
+      "version": "0.1.0",
+      "category": "verification",
+      "tags": [
+        "verification",
+        "adversarial-review",
+        "test-plan",
+        "mutation-testing",
+        "definition-of-done"
+      ]
+    }
+  ]
+}

@@ -14,6 +14,42 @@ added. A **patch** bump means wording, examples, or typos.
 
 ### Added
 
+- `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` — the
+  repository is now installable as a Claude Code plugin and is its own
+  single-plugin marketplace. The plugin manifest deliberately declares **no**
+  `skills` field: skills are auto-discovered from the top-level `skills/`
+  directory, so the plugin and the standalone skill are the same bytes rather
+  than two copies that can drift. Verified by installing from a local clone and
+  reading the component inventory back (`Skills (1) exam-protocol`).
+- Eight packaging gates in `scripts/check.sh` (checks 10–17): both manifests
+  parse; the marketplace entry resolves to a real plugin directory; the
+  marketplace name is not one Anthropic reserves; the skill directory name, its
+  frontmatter `name` and the documented invocation are one string; exactly one
+  `SKILL.md` exists; the README carries every section its compatibility matrix
+  promises; the documented repository URL is this repository; no relative link
+  is broken. Five were red on their first run; the other three were proved by
+  mutation. CONTRIBUTING.md records both.
+- README sections for the three install paths, a compatibility matrix showing
+  what `AGENTS.md` agents do **not** get, an "I installed it — now what?"
+  walkthrough, updating, uninstalling, and distribution.
+- A `Where this sits` section comparing this protocol with the `grilling` /
+  `grill-me` skill in `mattpocock-skills` — requirements first, verification
+  after. Read from that skill's source at v1.2.3 on 2026-08-19 and dated
+  accordingly, because a description of a file is an observation of the moment
+  it was read.
+
+### Fixed
+
+- **Every clone and install command pointed at a repository that does not
+  exist.** The repository is `blackmoore14/exam-protocol-skill`; the README and
+  both `CHANGELOG.md` links said `blackmoore14/exam-protocol`. This was the
+  resolved-but-wrong tail of the `OWNER` placeholder defect found by this
+  project's own sealed exam (Q-1-01): check 2 guards the literal placeholder and
+  is structurally unable to see a plausible wrong value, so it stayed green.
+  Check 16 now pins the documented URL to `git remote get-url origin`.
+
+### Added
+
 - `.gitattributes` pinning `*.md` to LF. The seal is a hash over bytes, and a
   clone with Git's Windows default rewrote every file, so the first check the
   protocol asks a reader to perform failed on day one.
@@ -55,5 +91,5 @@ added. A **patch** bump means wording, examples, or typos.
   delegates to `SKILL.md` rather than restating it.
 - `examples/` — one complete worked exam and answer sheet.
 
-[Unreleased]: https://github.com/blackmoore14/exam-protocol/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/blackmoore14/exam-protocol/releases/tag/v0.1.0
+[Unreleased]: https://github.com/blackmoore14/exam-protocol-skill/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.1.0

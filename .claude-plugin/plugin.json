@@ -1,0 +1,26 @@
+{
+  "name": "exam-protocol",
+  "displayName": "Exam Protocol",
+  "description": "Adversarial verification before you call work done: a fresh reviewer authors a sealed exam you cannot answer, a second reviewer answers it, and you only arbitrate. Ships the authoring dimensions, the rehearsal checks, covariate and negative-control detection, and mutation testing of guards.",
+  "version": "0.1.0",
+  "author": {
+    "name": "blackmoore14",
+    "url": "https://github.com/blackmoore14"
+  },
+  "homepage": "https://github.com/blackmoore14/exam-protocol-skill",
+  "repository": "https://github.com/blackmoore14/exam-protocol-skill",
+  "license": "MIT",
+  "keywords": [
+    "verification",
+    "adversarial-review",
+    "code-review",
+    "test-plan",
+    "mutation-testing",
+    "negative-control",
+    "quality-assurance",
+    "definition-of-done"
+  ],
+  "metadata": {
+    "category": "verification"
+  }
+}

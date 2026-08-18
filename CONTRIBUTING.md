@@ -131,17 +131,39 @@ sh scripts/check.sh
 
 Run it before opening a PR. `.github/workflows/check.yml` runs the same script
 on every push and pull request. It needs POSIX `sh`, `grep`, `find`, `wc`, `awk`
-and one SHA-256 utility; a check that cannot find a hasher reports `skip`, never
-`pass`.
+and one SHA-256 utility; checks 10–12 additionally need `node`. A check that
+cannot find the tool it needs reports `skip`, never `pass` — and in CI a skip is
+promoted to a failure, because a gate that quietly stopped guarding is the thing
+this repository is about.
 
-The nine gates enforce, in order: line endings are pinned; no unresolved account
-placeholder survives in a clone URL or release link; `SKILL.md` is within budget;
-no unmarked multi-line block
+The seventeen gates enforce, in order: line endings are pinned; no unresolved
+account placeholder survives in a clone URL or release link; `SKILL.md` is
+within budget; no unmarked multi-line block
 is shared between `README.md`, `AGENTS.md` and `SKILL.md`; every example file
 says it is fiction; the example answer sheet cites its sealed hash; that hash
 still matches the file on disk; only the three answer statuses appear in
-examples and templates; and the example exam's declared question count is its
-real one.
+examples and templates; the example exam's declared question count is its
+real one; the plugin manifest parses and does not re-declare the auto-discovered
+`skills/` directory; the marketplace manifest parses and its name is neither
+malformed nor reserved; every marketplace entry resolves to a real plugin
+manifest whose name agrees; the skill's directory name, frontmatter `name` and
+documented invocation are the same string; exactly one `SKILL.md` exists; the
+README carries every install, compatibility and lifecycle section it promises;
+the documented repository URL is this repository; and no relative Markdown link
+is broken.
+
+Two of them have escape hatches, because both guard against drift rather than
+against contributors:
+
+| Gate | Escape hatch | When to use it |
+|---|---|---|
+| 16, documented URL | `EXAM_PROTOCOL_REPO_SLUG=owner/repo` | You are working in a fork, whose remote is legitimately not the canonical URL. CI reads this from a repository variable of the same name. |
+| 16, other repositories | the `EXTERNAL_SLUGS` list in `scripts/check.sh` | The documentation deliberately links to somebody else's repository. Add it **with a comment saying why** — the point is that a third-party link is a named decision, so that a same-owner typo has nowhere to hide. |
+
+Check 15 pins a list of literal README headings. If you restructure the README,
+update that list in the same commit; it exists so that a distribution channel
+named in the compatibility matrix cannot end up with no instructions, which is
+worse than not supporting it.
 
 ### How these gates were proved
 
@@ -171,6 +193,68 @@ would produce. Both mutations were reverted and the files verified byte-identica
 Check 9's red was not in the answer sheet that prompted this work. The gate
 found it on its own, which is the only reason anyone knows the flagship example
 had been miscounting itself.
+
+### The packaging gates
+
+Checks 10–17 were added when this repository was made installable as a Claude
+Code plugin. They were written and run **before** the manifests existed, so five
+of the eight were red on their first run against the tree:
+
+| Check | First run, against the unpackaged tree |
+|---|---|
+| 10 plugin manifest | **red** — `.claude-plugin/plugin.json` did not exist |
+| 11 marketplace manifest | **red** — `.claude-plugin/marketplace.json` did not exist |
+| 12 entries resolve | **red** — nothing to resolve |
+| 13 skill name agrees | green — ratchet, see below |
+| 14 one `SKILL.md` | green — ratchet, see below |
+| 15 README sections | **red** — five of six required sections were absent |
+| 16 documented URL | **red** — and this one found a live defect, below |
+| 17 relative links | green — ratchet, see below |
+
+**Check 16 found a shipped defect, and it is the reason the check exists.** This
+project's own sealed exam (`exams/`, Q-1-01) found an unresolved `OWNER`
+placeholder in every clone command. The fix substituted a real account *and a
+repository name that was wrong* — the repository is `exam-protocol-skill`, and
+the documentation said `exam-protocol`. Check 2 stayed green throughout, because
+it looks for the literal placeholder and this was a resolved-but-wrong value.
+Every install command in the README and both links in `CHANGELOG.md` pointed at
+a repository that is not this one, under a gate that reported no problem.
+
+The lesson is narrower than "add more checks": a guard written against the
+*symptom you just fixed* does not cover the *class*. Check 2 guards "unresolved
+placeholder". Check 16 guards "the URL is this repository", which is the property
+anybody actually wanted.
+
+Checks 13, 14 and 17 were green on their first run, so they prove nothing on
+their own and were demonstrated red by mutation instead:
+
+| Check | Mutation | Result |
+|---|---|---|
+| 13 | frontmatter `name:` changed to `exam-protokol` | red — reported the disagreement with the directory name |
+| 14 | a second `SKILL.md` created at `skills/exam-protocol/exam-protocol/SKILL.md`, exactly the `cp -r` footgun the README warns about | red — found 2 |
+| 17 | a link to `skills/exam-protocol/NOPE.md` appended to the README | red — named the file and the target |
+
+Three branches of the packaging gates had also never fired, so they were mutated
+too: re-declaring `"skills": ["./skills"]` in the plugin manifest (10, red),
+renaming the marketplace to `anthropic-plugins` (11, red), and pointing the
+plugin `source` at `./does-not-exist` (12, red). Every mutation was reverted and
+the files verified identical to their pre-mutation copies.
+
+**Why those last three matter.** `claude plugin validate` passes all three of
+them. Measured on this repository against version 2.1.227 of the CLI: it
+rejects a missing `owner` and a name containing spaces, so it is demonstrably
+capable of failing — but it accepted `anthropic-plugins` as a marketplace name,
+accepted a `source` of `./does-not-exist`, and accepted a `source` of `.`
+without the required leading `./`. It validates schema, not resolution. Checks
+11 and 12 exist to cover exactly that gap, and neither replaces the other:
+
+```sh
+claude plugin validate .claude-plugin/plugin.json
+claude plugin validate .claude-plugin/marketplace.json
+```
+
+Run both before opening a PR that touches either manifest. They are not in CI —
+`.github/workflows/check.yml` says why at the bottom of the file.
 
 ## Proposing a translation
 

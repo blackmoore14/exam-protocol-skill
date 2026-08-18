@@ -12,6 +12,13 @@ This document deliberately contains **no rules**. Two copies of the same rules
 drift apart, and the drift is silent — which is precisely the failure this
 protocol exists to catch. If you are looking for what to do, open `SKILL.md`.
 
+This repository also ships a Claude Code plugin manifest under
+`.claude-plugin/`. **Ignore it.** None of that machinery — plugins,
+marketplaces, frontmatter, slash-command invocation, description-based
+triggering — exists on this path. You are here because a human wrote a pointer
+in a file and you read it, and that is the whole loading mechanism. The protocol
+itself is unaffected: it is prose and forms, and it works the same either way.
+
 Supporting material, loaded only when the task calls for it:
 
 | File | Load it when |
