@@ -1,0 +1,30 @@
+name: check
+
+# A gate that never runs is not a gate. This is the trigger, and CONTRIBUTING.md
+# records the first run of every check in scripts/check.sh against the unfixed
+# tree, because a guard that has never gone red has not been shown able to.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show the tools the script depends on
+        run: |
+          sh --version 2>/dev/null || true
+          awk --version | head -n 1
+          grep --version | head -n 1
+          command -v sha256sum
+
+      - name: Run repository gates
+        run: sh scripts/check.sh

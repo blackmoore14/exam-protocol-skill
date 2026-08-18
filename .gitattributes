@@ -1,0 +1,18 @@
+# The seal is a SHA-256 over bytes, so line endings are part of the contract.
+#
+# Without this file, a clone on a machine with Git's Windows default
+# (core.autocrlf=true) rewrites every .md to CRLF, and the first thing this
+# protocol asks a new reader to do — verify the seal on the shipped example —
+# fails with a mismatch whose stated remedy is "stop". That is a false positive
+# on the flagship guard, on day one, which is how guards get switched off.
+#
+# This must ship in the initial release. Adding it after adopters have cloned
+# re-creates the same mismatch in the other direction.
+
+* text=auto
+
+*.md    text eol=lf
+*.sh    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+LICENSE text eol=lf

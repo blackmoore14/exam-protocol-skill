@@ -1,0 +1,24 @@
+# Editors / OS
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.idea/
+.vscode/
+
+# Agent harness local state (never publish an agent's local config or transcripts)
+.claude/settings.local.json
+.claude/local/
+.codex/
+scratchpad/
+tmp/
+
+# Exams produced by *users* of this protocol against *their* code live in their
+# own repo, not here — keep those out of commits:
+exams/local/
+*-answers.local.md
+
+# But exams *of this protocol* are this project's own work product, and by its
+# own thesis they are the artifact that proves the thesis. They are committed:
+# see exams/ and exams/SEAL.md. Ignoring the whole directory used to hide them.
