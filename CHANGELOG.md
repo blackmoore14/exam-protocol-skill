@@ -10,6 +10,55 @@ normative rule changed meaning (something that used to pass now fails, or the
 reverse). A **minor** bump means a rule, dimension, or rehearsal check was
 added. A **patch** bump means wording, examples, or typos.
 
+## [Unreleased]
+
+_Nothing yet._
+
+## [0.2.1] - 2026-08-19
+
+Corrections found by an outside reviewer who had never seen this repository and
+was asked to look for reasons **not** to publish it. Every item below is the
+defect class this project sells itself on catching, found in this project.
+
+### Fixed
+
+- **Both CHANGELOG version links were dead, because no git tag had ever been
+  cut.** `v0.1.0` and `v0.2.0` both 404'd, `[0.2.0]` had no link definition at
+  all, and `[Unreleased]` still compared against `v0.1.0`. Tags now exist for
+  every released version. Gate 16 could not catch this: it validates the
+  `owner/repo` slug, not the path.
+- **`README.md` told you to read back `version: "0.1.0"` after installing
+  0.2.0.** Stale since the bump.
+- **A count that disagreed with itself.** `scripts/check.sh` said "six of the
+  nine went red"; `CONTRIBUTING.md` said "Seven of nine" and its table lists
+  seven. The table is right. By this project's own §3.3 that is a mechanical
+  red — a string that does not resolve against another string.
+- **Gate 10's pass label overclaimed.** It printed "skills/ left to
+  auto-discovery" while only rejecting four literal spellings, so
+  `skills: ["./skills/exam-protocol"]` passed and was reported as absent. The
+  check now normalises the path and rejects anything under `skills/`, and the
+  label states what was actually checked. Proved by mutation: the exact string
+  the reviewer found now fails, and the unmutated tree stays green.
+- **The repository layout omitted `references/extending.md`**, added in 0.2.0.
+- `[0.2.0]` was ordered above `[Unreleased]`, inverting the convention this file
+  cites. The packaging work previously sitting under `[Unreleased]` is now named
+  `[0.1.1]`, which is what actually shipped.
+
+### Added
+
+- **A comparison against `superpowers:verification-before-completion`.** The
+  existing comparison was with a tool that runs *earlier*; the one that runs at
+  the same moment sits in the official marketplace and was missing. Its Iron Law
+  is self-verification, which is precisely what this protocol argues is
+  structurally insufficient — the argument is the differentiation, and it was
+  never made. Omitting the closest neighbour reads as avoidance.
+- **"What kind of project this came from."** The five rules and the
+  discrimination reference are domain-neutral; **R1-R8 are not** — they were
+  shaped by a web application with authentication, an admin panel and payment
+  vendors, and nothing said so. Now stated plainly, with a translation for each
+  web-shaped check. This was the largest adoption barrier and it was an unstated
+  assumption in a document that states everything else.
+
 ## [0.2.0] — 2026-08-19
 
 ### Added
@@ -39,7 +88,7 @@ added. A **patch** bump means wording, examples, or typos.
   sentence, labelled as a database observation. The brief's author knew the whole
   document was unverified against screens and still could not see it.
 
-## [Unreleased]
+## [0.1.1] - 2026-08-19
 
 ### Added
 
@@ -120,5 +169,8 @@ added. A **patch** bump means wording, examples, or typos.
   delegates to `SKILL.md` rather than restating it.
 - `examples/` — one complete worked exam and answer sheet.
 
-[Unreleased]: https://github.com/blackmoore14/exam-protocol-skill/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/blackmoore14/exam-protocol-skill/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.2.1
+[0.2.0]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.2.0
+[0.1.1]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.1.1
 [0.1.0]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.1.0

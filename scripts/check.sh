@@ -4,7 +4,7 @@
 # This project's own reference material (references/discrimination.md §2.1) says a
 # guard that finds nothing on its first run against a real corpus has not been
 # shown capable of failing. Every check below was run against this tree *before*
-# the thing it checks was fixed; six of the nine went red. The two that were
+# the thing it checks was fixed; seven of the nine went red. The two that were
 # green on their first run (the line budget and the seal recomputation) are
 # ratchets rather than finders, and each was demonstrated red by mutation
 # instead. That evidence lives in CONTRIBUTING.md, "How these gates were proved".
@@ -292,7 +292,15 @@ const RESERVED = new Set([
 	'first-party-plugins', 'healthcare',
 ]);
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const DEFAULT_SKILL_DIRS = ['skills', './skills', 'skills/', './skills/'];
+// Normalised: strip a leading './' and any trailing '/'. Anything that then
+// starts with 'skills' is already auto-discovered, so declaring it is
+// redundant. The earlier literal list missed './skills/exam-protocol', which
+// is redundant for the same reason — found by an outside review, 2026-08-19.
+const normaliseDir = (s) => String(s).replace(/^\.\//, '').replace(/\/+$/, '');
+const isUnderSkills = (s) => {
+	const n = normaliseDir(s);
+	return n === 'skills' || n.startsWith('skills/');
+};
 
 function readJson(p) {
 	if (!fs.existsSync(p)) return { err: 'file not found' };
@@ -314,12 +322,14 @@ if (pm.err) {
 	// Skills are auto-discovered from a top-level skills/ directory. Listing it
 	// again buys nothing and invites the copy this repository exists to avoid.
 	const declared = p.skills == null ? [] : (Array.isArray(p.skills) ? p.skills : [p.skills]);
-	const redundant = declared.filter((s) => typeof s === 'string' && DEFAULT_SKILL_DIRS.includes(s));
+	const redundant = declared.filter((s) => typeof s === 'string' && isUnderSkills(s));
 	if (redundant.length) {
 		bad.push('"skills" re-declares the auto-discovered directory (' + redundant.join(', ') + ')');
 	}
 	if (bad.length) FAIL('10  ' + PM + ': ' + bad.join('; '));
-	else PASS('10  ' + PM + ' parses; name "' + p.name + '"; skills/ left to auto-discovery');
+	else PASS('10  ' + PM + ' parses; name "' + p.name + '"; '
+		+ (p.skills == null ? 'skills/ left to auto-discovery'
+			: 'no "skills" entry points inside skills/'));
 }
 
 // --- 11: the marketplace manifest -------------------------------------------

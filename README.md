@@ -75,6 +75,58 @@ fire from a description — do not expect it to trigger on its own. And **neithe
 tool is a gate**: that row is a similarity, not a difference, and admitting it
 is what makes the rest of the table worth reading.
 
+### The neighbour that runs at the same time
+
+`grilling` runs *before*. The tool that runs at exactly the same moment as this
+one is `verification-before-completion` in
+[`superpowers`](https://github.com/anthropics/claude-plugins-official) — its
+description is literally "when about to claim work is complete, fixed, or
+passing." Omitting it from a comparison page would be avoidance, so:
+
+Its Iron Law is **"If you haven't run the verification command in this message,
+you cannot claim it passes"** (`superpowers` v6.2.0, read 2026-08-19). That is a
+strictly better default than claiming without evidence, and most of the time it
+is the right amount of process.
+
+The difference is one word: **self**. It asks *you* to run the command and read
+the output. This protocol's whole premise is that the person who did the work
+cannot generate the questions that would expose it — not through carelessness,
+but because those questions do not occur to someone who already knows what they
+meant. So the two stack rather than compete:
+
+| | `verification-before-completion` | `exam-protocol` |
+|---|---|---|
+| Who verifies | **You**, in the same session | A second reader who never saw your reasoning |
+| What it catches | Claims made with no evidence at all | Claims made with evidence that **does not discriminate** |
+| Cost | Seconds | Two extra sessions |
+| Use it | **Every time** | When someone downstream will act on the artifact without re-checking it |
+
+Run the Iron Law always. Reach for an exam when being wrong costs a cycle rather
+than a re-run.
+
+### What kind of project this came from
+
+The five rules, the four roles, the seal, `does_not_grade`, and everything in
+[discrimination](skills/exam-protocol/references/discrimination.md) are
+domain-neutral — they are about evidence, not about stacks.
+
+The **rehearsal checks R1–R8 are not**. They were shaped by a web application
+with authentication, an admin panel, and third-party payment providers, and it
+shows: R1 assumes screens you log into, R4 assumes a browser, R7 assumes a
+routing table, R8 assumes payment vendors. Translate rather than skip —
+
+- **R1** *"walk it authenticated"* → run it the way the user runs it, in their
+  environment, not in your test harness.
+- **R3** *"count fixtures through the app's own read path"* → do not count with a
+  query the application itself would never issue.
+- **R7** *"compute entry points"* → derive the real surface (CLI flags, exported
+  functions, routes) from the code, do not recall it.
+- **R8** *"verify the provider, not the label"* → check what is actually
+  configured, not what the display name says.
+
+R2 (close the loop) and R6 (count what you promised; do not `grep -c`) need no
+translation at all, and in measured use they catch the most.
+
 ## What a confident pass looks like — and what actually caught each one
 
 Anonymized, all real, all from work that had already passed review. **The exam
@@ -242,7 +294,7 @@ Read the version back after every install:
 
 ```bash
 grep -A2 '^metadata:' ~/.claude/skills/exam-protocol/SKILL.md
-#   version: "0.1.0"
+#   version: "0.2.0"
 ```
 
 The plugin path has no equivalent hazard: `claude plugin update` replaces rather
@@ -517,7 +569,7 @@ scripts/check.sh               the repository's own gates — run it before a PR
 skills/exam-protocol/          auto-discovered by the plugin loader; also the
                                directory you copy for the other two install paths
   SKILL.md                     the protocol (normative, single source of truth)
-  references/
+  references/            discrimination.md, failure-modes.md, extending.md
     discrimination.md          covariates, negative controls, mutation testing,
                                the N-doors rule, bypass inventory
     failure-modes.md           anonymized post-mortems behind every rule

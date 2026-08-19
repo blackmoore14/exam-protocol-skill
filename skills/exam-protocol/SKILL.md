@@ -15,7 +15,7 @@ user-invocable: true
 argument-hint: "[path to the artifact to examine]"
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
   category: verification
 ---
 
