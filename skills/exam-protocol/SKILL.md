@@ -15,7 +15,7 @@ user-invocable: true
 argument-hint: "[path to the artifact to examine]"
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   category: verification
 ---
 
@@ -56,15 +56,14 @@ who already knows what they meant.
 | **Arbiter** | Usually the implementer or the person accountable for shipping. Rules on findings and fixes. **Does not answer the exam.** |
 
 "Fresh context" means a session, agent or person with no exposure to how the
-artifact came to be. An author who reads the implementer's rationale first
-inherits its blind spots and re-asks its assumptions back at it.
+artifact came to be. An author who reads the implementer's rationale inherits its
+blind spots and re-asks its assumptions back at it.
 
 **If you cannot get a genuinely fresh session, declare it rather than pretending.**
-Every exam header carries an **author independence** field: `independent`, or
-`self-authored (<reason>)`. A self-authored exam is not worthless — it is
-measurably weaker, and the reader is entitled to know which one they hold. The
-field is in `templates/exam.md` and the column is in `templates/seal.md`,
-because a rule with nowhere to be recorded is a rule nobody follows.
+Every exam header carries an **author independence** field — `independent` or
+`self-authored (<reason>)` — and `templates/seal.md` has the column, because a
+rule with nowhere to be recorded is a rule nobody follows. A self-authored exam
+is not worthless; it is measurably weaker, and the reader is entitled to know.
 
 ---
 
@@ -72,21 +71,19 @@ because a rule with nowhere to be recorded is a rule nobody follows.
 
 ### 3.1 The author must not know the answers
 
-The exam is authored read-only and sealed in the state `AUTHORED_NOT_RUN`. If the
-author stumbles across strong evidence while orienting, they record it as
-`author_side_note: <where they saw it>` — **never as a conclusion**. Compliance
-is declared as a list of sessions and their inputs (§4.1): "I did not check"
-leaves no trace, and a reader cannot audit an absence.
+The exam is authored read-only and sealed as `AUTHORED_NOT_RUN`. Strong evidence
+met while orienting is recorded as `author_side_note: <where they saw it>` —
+**never as a conclusion**. Compliance is declared as a list of sessions and their
+inputs (§4.1): "I did not check" leaves no trace, and an absence cannot be
+audited.
 
-The reason is not ceremony. An author who knows the answers writes only the
-questions they were able to check, and the expensive defects live precisely in
-the region of "hard to check, so nobody checked."
-
-That argument is about *systems*. For a **document** — the default target — the
-author has read all of it, so nothing was out of reach and the argument does not
-apply; the rule still binds because **writing the answer down pre-empts the
-answerer**, and the second fresh reader is the entire mechanism. Read all you
-like, but record locations, never conclusions.
+Two different reasons, depending on the target. For a *system*: an author who
+knows the answers writes only the questions they could check, and the expensive
+defects live in "hard to check, so nobody checked". For a **document** — the
+default — the author has read all of it, so nothing was out of reach; the rule
+still binds because **writing the answer down pre-empts the answerer**, and the
+second fresh reader is the entire mechanism. Read all you like; record locations,
+never conclusions.
 
 ### 3.2 Seal first, answer second — and seal **both** documents
 
@@ -105,6 +102,17 @@ sits between sealing and answering: every rule can be obeyed while the answers
 describe a document that no longer exists. For a directory, hash a manifest and
 say so; if you record no artifact hash write `not recorded`, because a blank
 column reads as "unchanged".
+
+**What the seal cannot freeze.** Most artifacts worth examining are documents
+making claims about a *running system*. Hashing the document pins the claims and
+pins nothing about the system — and the answers are about the system. Observed:
+while one exam was being answered, another agent was editing three of the
+services it asked about, every hash still matching.
+
+So record a third thing beside the two digests: **the system revision the answers
+describe** — a commit id, a deployed build tag. One line: *"answered against
+`<rev>`"*. If the system moves faster than the exam is answered, that is a
+finding about your process, not a detail to smooth over.
 
 ### 3.3 A red rate near either end is a claim about the exam, not the artifact
 
@@ -313,10 +321,9 @@ made an entire section unexecutable.
 > verify.**
 
 Reviewers, and especially automated agents, are commonly forbidden from entering
-passwords, creating accounts, solving CAPTCHAs, or making real payments. The
-deepest layer such an author reaches is "the interface responds"; the two below —
-*can the user find it*, *can the user finish it* — are out of reach, and that is
-where the errors accumulate:
+passwords, creating accounts, solving CAPTCHAs, or making real payments — so the
+deepest layer they reach is "the interface responds", and the two below are out
+of reach. That is where the errors accumulate:
 
 ```
 present in storage ≠ interface returns it ≠ rendered on screen ≠ user can find it ≠ user can finish it
@@ -375,19 +382,11 @@ Every exam states its blind spots. So does this protocol:
 
 ## 10. Adding your own dimensions and checks
 
-Your project will need a twelfth dimension or a ninth rehearsal check, and editing
-this vendored file to get one destroys the reason you vendored it: you can no
-longer tell your change from an upstream one.
-
-- **Numbers 12+ and R9+ are reserved for you.** Upstream never allocates them,
-  so a local and an upstream addition cannot collide.
-- **Put them in `SKILL.local.md`, beside this file, loaded after it**, naming the
-  upstream version it extends. `SKILL.md` then stays byte-identical to upstream
-  and `diff` keeps working.
-- **A local addition binds like an upstream one**, at the `CONTRIBUTING.md` bar:
-  name the incident, what it does not catch, and how you would know it works.
-- **Sharpening an existing dimension beats adding one.** If that would have
-  caught it, do that and open a pull request — the gap is an upstream bug.
+Your project will need a twelfth dimension or a ninth rehearsal check. **Numbers
+12+ and R9+ are reserved for you**, and local additions belong in
+`SKILL.local.md` beside this file — never edited into it, or you can no longer
+tell your change from an upstream one. Full procedure and the bar a local
+addition must clear: [references/extending.md](references/extending.md).
 
 ## 11. References
 

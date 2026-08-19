@@ -10,6 +10,35 @@ normative rule changed meaning (something that used to pass now fails, or the
 reverse). A **minor** bump means a rule, dimension, or rehearsal check was
 added. A **patch** bump means wording, examples, or typos.
 
+## [0.2.0] — 2026-08-19
+
+### Added
+
+- **§3.2 — what the seal cannot freeze.** Hashing the artifact pins the claims
+  and pins nothing about the running system the claims are about. Found on the
+  first real run of this protocol against a live project: while an exam was being
+  answered, a separate agent was editing three of the services the exam asked
+  about, with every hash still matching. The rule now asks for a third recorded
+  value — the system revision the answers describe — and says that a system
+  moving faster than its exam is a finding, not a detail.
+
+### Changed
+
+- **§10 moved to `references/extending.md`.** The §3.2 addition pushed
+  `SKILL.md` over its 400-line budget and the gate went red. Per `CONTRIBUTING`,
+  an addition must name what it replaces: extending the protocol is secondary to
+  using it, so it left. `SKILL.md` is 399 lines; the stub keeps the two rules an
+  extender must not miss (12+/R9+ reserved, `SKILL.local.md` not in-place edits).
+
+### Notes
+
+- The first real run also produced the protocol's first measured catch on a live
+  artifact: an exam question comparing a brief against a second status document
+  the executor would also open found a figure that mixed two environments — a
+  local-database tenant count paired with a production scope count, in one
+  sentence, labelled as a database observation. The brief's author knew the whole
+  document was unverified against screens and still could not see it.
+
 ## [Unreleased]
 
 ### Added
