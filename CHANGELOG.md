@@ -14,6 +14,43 @@ added. A **patch** bump means wording, examples, or typos.
 
 _Nothing yet._
 
+## [0.2.2] - 2026-08-19
+
+### Changed
+
+- **The description now leads with the situation, not with what the tool is.**
+  It opened `Adversarial verification protocol for deciding whether work is
+  actually finished` — a definition — and put the trigger last, as a list of
+  literal phrases the user had to say. That inherits the blind spot the protocol
+  exists to remove: someone confidently about to say "done" is, by definition,
+  not thinking "I should be examined," so a description that waits to be asked
+  for by name is asking the subject to diagnose themselves.
+
+  It now opens `Use when about to call work finished and someone downstream will
+  act on it without re-checking it`, and names §1's four rows — handing over a
+  brief or test plan, marking something verified in a ledger, telling a
+  stakeholder it is done, withdrawing someone else's defect report.
+
+  It also states the exclusion, because over-firing is the failure mode that
+  gets a skill turned off: *skip it for a single reversible bugfix that already
+  has test coverage.*
+
+  Three literal phrases were dropped to stay inside the 400-line budget
+  (`verify this is complete`, `review my test plan`, `before I ship`) — the
+  situational clause now covers them, and per CONTRIBUTING an addition names
+  what it replaced.
+
+  **Not claimed:** whether a model actually invokes it more often after this is
+  unmeasured. What is checkable is that the structure now matches
+  `superpowers:verification-before-completion`, the one skill in the official
+  marketplace occupying the same moment.
+
+### Added
+
+- README **"When it fires"** — states that the skill is model-invocable, why it
+  deliberately does not ship `disable-model-invocation`, and how to turn that
+  off if you would rather it never started on its own.
+
 ## [0.2.1] - 2026-08-19
 
 Corrections found by an outside reviewer who had never seen this repository and
@@ -169,7 +206,8 @@ defect class this project sells itself on catching, found in this project.
   delegates to `SKILL.md` rather than restating it.
 - `examples/` — one complete worked exam and answer sheet.
 
-[Unreleased]: https://github.com/blackmoore14/exam-protocol-skill/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/blackmoore14/exam-protocol-skill/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.2.2
 [0.2.1]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.2.1
 [0.2.0]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.2.0
 [0.1.1]: https://github.com/blackmoore14/exam-protocol-skill/releases/tag/v0.1.1

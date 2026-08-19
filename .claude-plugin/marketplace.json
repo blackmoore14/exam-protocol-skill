@@ -10,7 +10,7 @@
       "name": "exam-protocol",
       "source": "./",
       "description": "Adversarial verification: a sealed exam authored by someone who did not do the work, answered by someone who did not write the exam.",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "category": "verification",
       "tags": [
         "verification",

@@ -1,21 +1,22 @@
 ---
 name: exam-protocol
 description: >
-  Adversarial verification protocol for deciding whether work is actually
-  finished. A fresh reviewer authors a sealed exam of deliberately awkward
-  questions about an artifact — a test plan, a release checklist, a status
-  ledger, a "done" claim — a second fresh reviewer answers it, and only then may
-  the work be called complete. Includes the authoring-dimension checklist, the
-  rehearsal checks, covariate and negative-control detection, mutation testing
-  of guards, and a mandatory does_not_grade declaration. Use when the user says
-  "exam", "sealed exam", "am I really done", "verify this is complete", "review
-  my test plan", "before I ship", "adversarial review", "negative control",
+  Use when about to call work finished and someone downstream will act on it
+  without re-checking it — handing another party a brief, test plan or
+  instruction pack; marking something verified, working or shipped in a status
+  ledger; telling a stakeholder a thing is done; or withdrawing someone else's
+  defect report. Self-review cannot catch what these hide, because the person
+  writing the checklist is the person answering it; instead a fresh reviewer
+  authors a sealed exam, a second fresh reviewer answers it, and the implementer
+  only arbitrates. Skip it for a single reversible bugfix that already has test
+  coverage — the cost is out of proportion. Also use when asked for a "sealed
+  exam", "am I really done", "adversarial review", "negative control",
   "covariate", "mutation test", "rehearsal", or "does_not_grade".
 user-invocable: true
 argument-hint: "[path to the artifact to examine]"
 license: MIT
 metadata:
-  version: "0.2.1"
+  version: "0.2.2"
   category: verification
 ---
 

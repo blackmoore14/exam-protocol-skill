@@ -2,7 +2,7 @@
   "name": "exam-protocol",
   "displayName": "Exam Protocol",
   "description": "Adversarial verification before you call work done: a fresh reviewer authors a sealed exam you cannot answer, a second reviewer answers it, and you only arbitrate. Ships the authoring dimensions, the rehearsal checks, covariate and negative-control detection, and mutation testing of guards.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": {
     "name": "blackmoore14",
     "url": "https://github.com/blackmoore14"

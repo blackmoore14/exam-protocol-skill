@@ -374,6 +374,42 @@ If your organization namespaces skills, use `<org>-exam-protocol` in both.
 Nothing else inside the skill directory refers to its own name. In this
 repository `scripts/check.sh` check 13 fails when those copies disagree.
 
+## When it fires
+
+The skill is **model-invocable**: it can start on its own when what you are doing
+matches its description, and you can also call it by name. It deliberately does
+**not** carry `disable-model-invocation`, and the reason is the protocol's own
+premise —
+
+> the person who did the work cannot generate the questions that would expose it
+
+— which applies to *reaching for this tool* exactly as much as it applies to
+reviewing. Someone confidently about to say "done" is, by definition, not
+thinking "I should be examined." A protocol that only runs when its subject
+requests it inherits the blind spot it exists to remove.
+
+So the description leads with the **situation**, not with what the tool is:
+about to call work finished when someone downstream will act on it without
+re-checking — handing over a brief or test plan, marking something verified in a
+ledger, telling a stakeholder it is done, withdrawing someone else's defect
+report. Those are §1's four rows, restated where a matcher can see them.
+
+It also states the exclusion, because over-firing is the failure mode that gets
+a skill turned off: **skip it for a single reversible bugfix that already has
+test coverage.** Three sessions is out of proportion there, and §1 says so.
+
+**What is not claimed.** Whether a model actually invokes more often after this
+wording is not something this repository has measured, and phrasing it as if it
+were would be exactly the kind of unearned claim the protocol exists to catch.
+What *is* checkable: the structure now matches
+`superpowers:verification-before-completion`, the one skill in the official
+marketplace that runs at this same moment, which opens `Use when about to claim
+work is complete, fixed, or passing`.
+
+If you would rather it never started on its own, add
+`disable-model-invocation: true` to the skill's frontmatter — that is how
+`grill-me` is shipped, and it is a legitimate choice.
+
 ## I installed it — now what?
 
 The protocol needs **three separate sessions**, because the separations are the
